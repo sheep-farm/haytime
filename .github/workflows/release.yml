@@ -39,13 +39,13 @@ jobs:
 
       - name: Package (Unix)
         if: runner.os != 'Windows'
-        run: tar czf haytime-${{ matrix.target }}.tar.gz -C target/${{ matrix.target }}/release libhaytime.${{ matrix.ext }}
+        run: tar czf haytime-v${{ github.ref_name }}-${{ matrix.target }}.tar.gz -C target/${{ matrix.target }}/release libhaytime.${{ matrix.ext }}
 
       - name: Package (Windows)
         if: runner.os == 'Windows'
-        run: Compress-Archive -Path target/${{ matrix.target }}/release/haytime.dll -DestinationPath haytime-${{ matrix.target }}.zip
+        run: Compress-Archive -Path target/${{ matrix.target }}/release/haytime.dll -DestinationPath haytime-v${{ github.ref_name }}-${{ matrix.target }}.zip
 
       - name: Upload binaries to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: haytime-${{ matrix.target }}.*
+          files: haytime-v${{ github.ref_name }}-${{ matrix.target }}.*
