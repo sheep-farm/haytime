@@ -1,0 +1,25 @@
+// Basic date/time operations with haytime
+import("sheep-farm/haytime", as=ht)
+
+// Parse a date string
+let ts = ht::parse_date("2024-01-15", "%Y-%m-%d")
+print("Parsed timestamp:", ts)
+
+// Format it back
+let formatted = ht::format_date(ts, "%Y-%m-%d")
+print("Formatted:", formatted)
+
+// Get current timestamp
+let now = ht::now()
+print("Current timestamp:", now)
+print("Current date:", ht::format_date(now, "%Y-%m-%d %H:%M:%S"))
+
+// Extract components
+print("Year:", ht::year(now))
+print("Month:", ht::month(now))
+print("Day:", ht::day(now))
+print("Hour:", ht::hour(now))
+print("Minute:", ht::minute(now))
+print("Second:", ht::second(now))
+print("Weekday:", ht::weekday(now))
+print("Is weekend:", ht::is_weekend(now))

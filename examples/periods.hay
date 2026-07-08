@@ -1,0 +1,25 @@
+// Period calculations with haytime
+import("sheep-farm/haytime", as=ht)
+
+let now = ht::now()
+print("Now:", ht::format_date(now, "%Y-%m-%d"))
+
+// Month boundaries
+let month_start = ht::start_of_month(now)
+let month_end = ht::end_of_month(now)
+print("Month start:", ht::format_date(month_start, "%Y-%m-%d"))
+print("Month end:", ht::format_date(month_end, "%Y-%m-%d"))
+print("Days in month:", ht::days_in_month(now))
+
+// Year boundaries
+let year_start = ht::start_of_year(now)
+let year_end = ht::end_of_year(now)
+print("Year start:", ht::format_date(year_start, "%Y-%m-%d"))
+print("Year end:", ht::format_date(year_end, "%Y-%m-%d"))
+
+// Check if current date is weekend
+if ht::is_weekend(now) {
+    print("Today is weekend!")
+} else {
+    print("Today is weekday")
+}

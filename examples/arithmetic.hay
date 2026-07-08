@@ -1,0 +1,27 @@
+// Date arithmetic with haytime
+import("sheep-farm/haytime", as=ht)
+
+let now = ht::now()
+print("Now:", ht::format_date(now, "%Y-%m-%d"))
+
+// Add days
+let next_week = ht::add_days(now, 7)
+print("Next week:", ht::format_date(next_week, "%Y-%m-%d"))
+
+let last_month = ht::add_days(now, -30)
+print("Last month:", ht::format_date(last_month, "%Y-%m-%d"))
+
+// Add months
+let next_month = ht::add_months(now, 1)
+print("Next month:", ht::format_date(next_month, "%Y-%m-%d"))
+
+let next_year = ht::add_months(now, 12)
+print("Next year:", ht::format_date(next_year, "%Y-%m-%d"))
+
+// Add years
+let two_years = ht::add_years(now, 2)
+print("Two years:", ht::format_date(two_years, "%Y-%m-%d"))
+
+// Difference in days
+let diff = ht::diff_days(next_week, now)
+print("Days until next week:", diff)

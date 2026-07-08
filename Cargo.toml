@@ -1,0 +1,13 @@
+[package]
+name = "haytime"
+version = "0.1.0"
+edition = "2021"
+description = "Date and time manipulation plugin for Hayashi"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+hayashi-plugin-sdk = { git = "https://github.com/sheep-farm/hayashi-plugin-sdk.git", branch = "main" }
+chrono = "0.4"
