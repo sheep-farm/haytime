@@ -1,6 +1,6 @@
 #![allow(clippy::not_unsafe_ptr_arg_deref)]
+use chrono::{DateTime, Datelike, Duration, NaiveDate, NaiveDateTime, Timelike, Utc};
 use hayashi_plugin_sdk::{hayashi_fn, hayashi_plugin};
-use chrono::{DateTime, NaiveDate, NaiveDateTime, Datelike, Timelike, Duration, Utc};
 
 hayashi_plugin!();
 
@@ -12,9 +12,11 @@ hayashi_plugin!();
 fn ts_to_dt(ms: i64) -> NaiveDateTime {
     DateTime::from_timestamp_millis(ms)
         .map(|dt| dt.naive_utc())
-        .unwrap_or_else(|| DateTime::from_timestamp_millis(0)
-            .expect("epoch válido")
-            .naive_utc())
+        .unwrap_or_else(|| {
+            DateTime::from_timestamp_millis(0)
+                .expect("epoch válido")
+                .naive_utc()
+        })
 }
 
 /// Converte ano/mês/dia para NaiveDate, usando o último dia válido do mês se necessário.
@@ -69,8 +71,14 @@ pub fn add_months(timestamp: i64, months: i64) -> i64 {
     let dt = ts_to_dt(timestamp);
     let mut year = dt.year();
     let mut month = dt.month() as i64 + months;
-    while month > 12 { year += 1; month -= 12; }
-    while month < 1  { year -= 1; month += 12; }
+    while month > 12 {
+        year += 1;
+        month -= 12;
+    }
+    while month < 1 {
+        year -= 1;
+        month += 12;
+    }
     let date = ymd(year, month as u32, dt.day());
     date.and_hms_opt(dt.hour(), dt.minute(), dt.second())
         .map(|d| d.and_utc().timestamp_millis())
@@ -263,7 +271,7 @@ mod tests {
     #[test]
     fn test_format_date_roundtrip() {
         let ts = __hayashi_impl_parse_date("2024-03-15".to_string(), "%Y-%m-%d".to_string());
-        let s  = __hayashi_impl_format_date(ts, "%Y-%m-%d".to_string());
+        let s = __hayashi_impl_format_date(ts, "%Y-%m-%d".to_string());
         assert_eq!(s, "2024-03-15");
     }
 
@@ -324,14 +332,20 @@ mod tests {
     fn test_add_days_positive() {
         let ts = __hayashi_impl_parse_date("2024-01-01".to_string(), "%Y-%m-%d".to_string());
         let ts2 = __hayashi_impl_add_days(ts, 30);
-        assert_eq!(__hayashi_impl_format_date(ts2, "%Y-%m-%d".to_string()), "2024-01-31");
+        assert_eq!(
+            __hayashi_impl_format_date(ts2, "%Y-%m-%d".to_string()),
+            "2024-01-31"
+        );
     }
 
     #[test]
     fn test_add_days_negative() {
         let ts = __hayashi_impl_parse_date("2024-02-01".to_string(), "%Y-%m-%d".to_string());
         let ts2 = __hayashi_impl_add_days(ts, -1);
-        assert_eq!(__hayashi_impl_format_date(ts2, "%Y-%m-%d".to_string()), "2024-01-31");
+        assert_eq!(
+            __hayashi_impl_format_date(ts2, "%Y-%m-%d".to_string()),
+            "2024-01-31"
+        );
     }
 
     #[test]
@@ -347,14 +361,20 @@ mod tests {
     fn test_add_months() {
         let ts = __hayashi_impl_parse_date("2024-01-15".to_string(), "%Y-%m-%d".to_string());
         let ts2 = __hayashi_impl_add_months(ts, 3);
-        assert_eq!(__hayashi_impl_format_date(ts2, "%Y-%m".to_string()), "2024-04");
+        assert_eq!(
+            __hayashi_impl_format_date(ts2, "%Y-%m".to_string()),
+            "2024-04"
+        );
     }
 
     #[test]
     fn test_add_months_year_wrap() {
         let ts = __hayashi_impl_parse_date("2024-11-15".to_string(), "%Y-%m-%d".to_string());
         let ts2 = __hayashi_impl_add_months(ts, 3);
-        assert_eq!(__hayashi_impl_format_date(ts2, "%Y-%m".to_string()), "2025-02");
+        assert_eq!(
+            __hayashi_impl_format_date(ts2, "%Y-%m".to_string()),
+            "2025-02"
+        );
     }
 
     #[test]
@@ -368,37 +388,52 @@ mod tests {
 
     #[test]
     fn test_start_of_month() {
-        let ts  = __hayashi_impl_parse_date("2024-03-15".to_string(), "%Y-%m-%d".to_string());
+        let ts = __hayashi_impl_parse_date("2024-03-15".to_string(), "%Y-%m-%d".to_string());
         let som = __hayashi_impl_start_of_month(ts);
-        assert_eq!(__hayashi_impl_format_date(som, "%Y-%m-%d".to_string()), "2024-03-01");
+        assert_eq!(
+            __hayashi_impl_format_date(som, "%Y-%m-%d".to_string()),
+            "2024-03-01"
+        );
     }
 
     #[test]
     fn test_end_of_month_march() {
-        let ts  = __hayashi_impl_parse_date("2024-03-15".to_string(), "%Y-%m-%d".to_string());
+        let ts = __hayashi_impl_parse_date("2024-03-15".to_string(), "%Y-%m-%d".to_string());
         let eom = __hayashi_impl_end_of_month(ts);
-        assert_eq!(__hayashi_impl_format_date(eom, "%Y-%m-%d".to_string()), "2024-03-31");
+        assert_eq!(
+            __hayashi_impl_format_date(eom, "%Y-%m-%d".to_string()),
+            "2024-03-31"
+        );
     }
 
     #[test]
     fn test_end_of_month_february_leap() {
-        let ts  = __hayashi_impl_parse_date("2024-02-10".to_string(), "%Y-%m-%d".to_string());
+        let ts = __hayashi_impl_parse_date("2024-02-10".to_string(), "%Y-%m-%d".to_string());
         let eom = __hayashi_impl_end_of_month(ts);
-        assert_eq!(__hayashi_impl_format_date(eom, "%Y-%m-%d".to_string()), "2024-02-29");
+        assert_eq!(
+            __hayashi_impl_format_date(eom, "%Y-%m-%d".to_string()),
+            "2024-02-29"
+        );
     }
 
     #[test]
     fn test_start_of_year() {
-        let ts  = __hayashi_impl_parse_date("2024-07-04".to_string(), "%Y-%m-%d".to_string());
+        let ts = __hayashi_impl_parse_date("2024-07-04".to_string(), "%Y-%m-%d".to_string());
         let soy = __hayashi_impl_start_of_year(ts);
-        assert_eq!(__hayashi_impl_format_date(soy, "%Y-%m-%d".to_string()), "2024-01-01");
+        assert_eq!(
+            __hayashi_impl_format_date(soy, "%Y-%m-%d".to_string()),
+            "2024-01-01"
+        );
     }
 
     #[test]
     fn test_end_of_year() {
-        let ts  = __hayashi_impl_parse_date("2024-07-04".to_string(), "%Y-%m-%d".to_string());
+        let ts = __hayashi_impl_parse_date("2024-07-04".to_string(), "%Y-%m-%d".to_string());
         let eoy = __hayashi_impl_end_of_year(ts);
-        assert_eq!(__hayashi_impl_format_date(eoy, "%Y-%m-%d".to_string()), "2024-12-31");
+        assert_eq!(
+            __hayashi_impl_format_date(eoy, "%Y-%m-%d".to_string()),
+            "2024-12-31"
+        );
     }
 
     // ── days_in_month ─────────────────────────────────────────────────────────
